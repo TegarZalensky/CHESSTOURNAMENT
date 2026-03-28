@@ -28,13 +28,48 @@
         <a href="https://forms.gle/fjon7s1iaqXm3tf87" class="btn-daftar">DAFTAR SEKARANG</a>
     </header>
 
-    <div class="container">
-        <div class="pengumuman">
-            <h3>📢 PAPAN PENGUMUMAN</h3>
-            <p>- Pendaftaran resmi dibuka! Sisa kuota: <strong>42/50</strong>.<br>
-               - Turnamen akan diadakan hari Sabtu, pukul 20:00 WIB.<br>
-               - Segala bentuk kecurangan (Engine/Stockfish) akan langsung di-BANNED permanen!</p>
-        </div>
+    <div class="pengumuman">
+    <h3>📢 INFO TERBARU</h3>
+    <p id="teks-pengumuman">Sedang memuat pengumuman...</p>
+    <p>Sisa Kuota: <strong id="angka-slot" style="color: #ffcc00; font-size: 1.2em;">--</strong> / 50</p>
+</div>
+
+<script>
+    // GANTI LINK DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS LO TADI
+    const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
+
+    async function updateDataDariSheets() {
+        try {
+            const response = await fetch(urlSheets);
+            const data = await response.text();
+            
+            // Proses data CSV sederhana
+            const baris = data.split('\n');
+            const dataSheet = {};
+            
+            baris.forEach(b => {
+                const item = b.split(',');
+                dataSheet[item[0]] = item[1];
+            });
+
+            // Update ke tampilan Website
+            if(dataSheet.pengumuman) {
+                document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
+            }
+            if(dataSheet.slot_sisa) {
+                document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
+            }
+            
+        } catch (e) {
+            console.error("Gagal ambil data admin:", e);
+        }
+    }
+
+    // Jalankan fungsinya
+    updateDataDariSheets();
+    // Refresh otomatis tiap 1 menit
+    setInterval(updateDataDariSheets, 60000);
+</script>
 
    <div class="card">
     <h2 class="section-title">🏆 Klasemen Live Arena</h2>
