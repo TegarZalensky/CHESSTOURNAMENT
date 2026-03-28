@@ -3,20 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turnamen Catur Merakyat</title>
+    <title>Pion Merakyat Cup</title>
     <style>
+        /* === CSS DASAR === */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background-color: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .section-title { border-bottom: 2px solid #333; padding-bottom: 10px; color: #4CAF50; margin-top: 0; }
+        
+        /* === HEADER & BUTTON === */
         header { background-color: #1f1f1f; padding: 40px 20px; text-align: center; border-bottom: 3px solid #4CAF50; }
         h1 { margin: 0; font-size: 2.5em; color: #4CAF50; }
         .subtitle { color: #aaaaaa; font-size: 1.2em; margin-top: 10px; }
         .btn-daftar { display: inline-block; background-color: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; font-size: 1.2em; font-weight: bold; border-radius: 5px; margin-top: 20px; transition: 0.3s; }
         .btn-daftar:hover { background-color: #45a049; }
-        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        
+        /* === PENGUMUMAN === */
         .pengumuman { background-color: #332b00; border-left: 5px solid #ffcc00; padding: 15px; margin-bottom: 30px; border-radius: 4px; }
         .pengumuman h3 { margin-top: 0; color: #ffcc00; }
-        .section-title { border-bottom: 2px solid #333; padding-bottom: 10px; color: #4CAF50; }
-        .card { background-color: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        footer { text-align: center; padding: 20px; color: #777; font-size: 0.9em; margin-top: 40px; border-top: 1px solid #333; }
+
+        /* === CAROUSEL BUKTI DANA === */
+        .carousel-container { position: relative; width: 100%; overflow: hidden; padding: 10px 0; }
+        .carousel-track { display: flex; transition: transform 0.8s ease-in-out; }
+        .carousel-item { min-width: calc(100% / 3); box-sizing: border-box; padding: 0 5px; }
+        .carousel-img { width: 100%; height: 200px; object-fit: cover; background-color: #000; border-radius: 8px; border: 1px solid #444; }
+
+        /* === YOUTUBE & ATURAN === */
+        .youtube-container { position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 2px solid #333; }
+        .aturan-list { line-height: 1.8; color: #ddd; }
+
+        /* === FOOTER & MEDSOS === */
+        footer { text-align: center; padding: 30px 20px; background: #1a1a1a; margin-top: 40px; border-top: 2px solid #333; }
+        .social-links a { color: #4CAF50; text-decoration: none; font-weight: bold; margin: 0 10px; font-size: 1.1em; }
+        .social-links a:hover { color: #fff; }
+
+        /* RESPONSIVE HP */
+        @media (max-width: 600px) {
+            .carousel-item { min-width: 50%; }
+            .carousel-img { height: 150px; }
+        }
     </style>
 </head>
 <body>
@@ -24,250 +49,197 @@
     <header>
         <h1>PION MERAKYAT CUP #1</h1>
         <p class="subtitle">Turnamen Catur Online Casual | Rating 300 - 2000</p>
-        <p>Entry: Rp 5.000 | Slot: Maksimal 50 Orang</p>
-        <a href="https://forms.gle/fjon7s1iaqXm3tf87" class="btn-daftar">DAFTAR SEKARANG</a>
+        <p>Entry: Rp 5.000 | Sisa Kuota: <strong id="angka-slot" style="color: #ffcc00; font-size: 1.3em;">--</strong></p>
+        <a href="#" id="btn-daftar" class="btn-daftar">DAFTAR SEKARANG</a>
     </header>
 
-    <div class="pengumuman">
-    <h3>📢 INFO TERBARU</h3>
-    <p id="teks-pengumuman">Sedang memuat pengumuman...</p>
-    <p>Sisa Kuota: <strong id="angka-slot" style="color: #ffcc00; font-size: 1.2em;">--</strong> / 50</p>
-</div>
-<div class="card" id="bagian-galeri" style="display: none;"> <h2 class="section-title">💸 Bukti Pendaftaran (Baru Dibayar)</h2>
-    <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Transparan dan Terpercaya.</p>
-    
-    <div class="slider-container">
-        <div class="slider-track" id="slider-track">
+    <div class="container">
+        <div class="pengumuman">
+            <h3>📢 INFO TERBARU</h3>
+            <p id="teks-pengumuman">Sedang memuat sistem...</p>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">🏆 Klasemen Live Arena</h2>
+            <p id="status-update" style="color: #888; font-size: 0.8em;">Memuat data dari Lichess...</p>
+            <div id="tabel-klasemen" style="overflow-x: auto; background: #1a1a1a; padding: 10px; border-radius: 8px;">
+                <p>Menghubungkan...</p>
             </div>
-        <button class="slider-btn prev" onclick="geserSlide(-1)">&#10094;</button>
-        <button class="slider-btn next" onclick="geserSlide(1)">&#10095;</button>
-    </div>
-</div>
+        </div>
 
-<style>
-    /* CSS Buat Slider Gambar */
-    .slider-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; border: 3px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-    .slider-track { display: flex; transition: transform 0.5s ease-in-out; }
-    .slider-item { min-width: 100%; box-sizing: border-box; }
-    .slider-img { width: 100%; height: auto; display: block; object-fit: contain; background-color: #000; }
-    
-    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 50%; font-size: 1.2em; z-index: 10; transition: 0.3s; }
-    .slider-btn:hover { background: #4CAF50; }
-    .slider-btn.prev { left: 10px; }
-    .slider-btn.next { right: 10px; }
-</style>
-<script>
-    // GANTI LINK DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS LO TADI
-    const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
+        <div class="card" id="bagian-galeri" style="display: none;">
+            <h2 class="section-title">💸 Bukti Pendaftaran</h2>
+            <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Transparan dan Terpercaya.</p>
+            <div class="carousel-container">
+                <div class="carousel-track" id="carousel-track"></div>
+            </div>
+        </div>
 
-    async function updateDataDariSheets() {
-    try {
-        const response = await fetch(urlSheets);
-        const csvText = await response.text();
-        
-        // Regex ini fungsinya biar koma di dalem tanda kutip nggak ikut kepisah
-        const rows = csvText.split(/\r?\n/);
-        const dataSheet = {};
-
-        rows.forEach(row => {
-            // Memisahkan kolom tapi mengabaikan koma di dalam teks (CSV Standard)
-            const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-            if (columns && columns.length >= 2) {
-                const key = columns[0].replace(/"/g, "").trim();
-                const value = columns[1].replace(/"/g, "").trim();
-                dataSheet[key] = value;
-            }
-        });
-
-        // Update ke Website
-        if(dataSheet.pengumuman) {
-            document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
-        }
-        if(dataSheet.slot_sisa) {
-            document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
-        }
-        // Link WA kalau mau dibuat dinamis juga
-        if(dataSheet.link_wa) {
-            const btnDaftar = document.querySelector('.btn-daftar');
-            if(btnDaftar) btnDaftar.href = dataSheet.link_wa;
-        }
-        
-    } catch (e) {
-        console.error("Gagal ambil data:", e);
-    }
-}
-
-    // Jalankan fungsinya
-    updateDataDariSheets();
-    // Refresh otomatis tiap 1 menit
-    setInterval(updateDataDariSheets, 60000);
-    
-</script>
-
-   <div class="card">
-    <h2 class="section-title">🏆 Klasemen Live Arena</h2>
-    <p id="status-update" style="color: #888; font-size: 0.8em;">Memuat data terbaru...</p>
-    
-    <div id="tabel-klasemen" style="overflow-x: auto; background: #1e1e1e; padding: 10px; border-radius: 8px; border: 1px solid #333;">
-        <p>Menghubungkan ke Lichess Arena...</p>
-    </div>
-</div>
-
-<script>
-    // ID Turnamen dari link yang lo kasih
-    const arenaId = "qjRAZi6S"; 
-
-    async function updateKlasemenArena() {
-        const url = `https://lichess.org/api/tournament/${arenaId}`;
-        
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            
-            if (!data.standing || !data.standing.players) {
-                document.getElementById("tabel-klasemen").innerHTML = "<p>Belum ada pemain yang bergabung.</p>";
-                return;
-            }
-
-            let htmlTabel = `
-                <table style="width: 100%; border-collapse: collapse; text-align: left; color: #eee; font-size: 0.95em;">
-                    <tr style="border-bottom: 2px solid #4CAF50; background: #252525;">
-                        <th style="padding: 12px;">Pos</th>
-                        <th style="padding: 12px;">Nama Pemain</th>
-                        <th style="padding: 12px;">Rating</th>
-                        <th style="padding: 12px; text-align: center;">Poin</th>
-                    </tr>
-            `;
-            
-            data.standing.players.forEach((player, index) => {
-                // Kasih warna emas buat peringkat 1
-                const rowColor = index === 0 ? "color: #ffcc00; font-weight: bold;" : "";
-                const bgColor = index % 2 === 0 ? "background: #1a1a1a;" : "background: #222;";
-                
-                htmlTabel += `
-                    <tr style="${bgColor} border-bottom: 1px solid #333;">
-                        <td style="padding: 12px; ${rowColor}">#${index + 1}</td>
-                        <td style="padding: 12px;">
-                            ${player.name} 
-                            ${player.withdraw ? '<span style="color: #ff4444; font-size: 0.7em;">(Keluar)</span>' : ''}
-                        </td>
-                        <td style="padding: 12px; color: #888;">${player.rating}</td>
-                        <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: #4CAF50;">
-                            ${player.score}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            htmlTabel += "</table>";
-            
-            document.getElementById("tabel-klasemen").innerHTML = htmlTabel;
-            
-            // Update waktu terakhir dicek
-            const skrg = new Date().toLocaleTimeString('id-ID');
-            document.getElementById("status-update").innerText = `Terakhir diperbarui: Pukul ${skrg}`;
-
-        } catch (error) {
-            console.error("Error:", error);
-            document.getElementById("tabel-klasemen").innerHTML = "<p style='color: #ff4444;'>Gagal mengambil data. Pastikan ID Turnamen benar.</p>";
-        }
-    }
-
-    // Jalankan pertama kali
-    updateKlasemenArena();
-    
-    // Auto-refresh setiap 20 detik biar makin kerasa "Live"
-    setInterval(updateKlasemenArena, 20000);
-    let currentSlide = 0;
-let totalSlides = 0;
-
-async function updateDataDariSheets() {
-    try {
-        const response = await fetch(urlSheets);
-        const csvText = await response.text();
-        
-        // Pemrosesan CSV Standar
-        const rows = csvText.split(/\r?\n/);
-        const dataSheet = {};
-        rows.forEach(row => {
-            const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-            if (columns && columns.length >= 2) {
-                const key = columns[0].replace(/"/g, "").trim();
-                const value = columns[1].replace(/"/g, "").trim();
-                dataSheet[key] = value;
-            }
-        });
-
-        // 1. Update Pengumuman & Slot (Sistem Lama)
-        if(dataSheet.pengumuman) document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
-        if(dataSheet.slot_sisa) document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
-
-        // 2. Update Galeri Bukti Transfer (Sistem Baru)
-        if(dataSheet.daftar_bukti && dataSheet.daftar_bukti.length > 5) { // Pastikan ada isinya
-            const containerGaleri = document.getElementById('bagian-galeri');
-            const sliderTrack = document.getElementById('slider-track');
-            sliderTrack.innerHTML = ''; // Bersihkan loading
-
-            const listBukti = dataSheet.daftar_bukti.split(',');
-            totalSlides = listBukti.length;
-
-            // Bikin element gambar otomatis
-            listBukti.forEach((urlGambar, index) => {
-                const cleanUrl = urlGambar.trim();
-                if(cleanUrl) {
-                    sliderTrack.innerHTML += `
-                        <div class="slider-item">
-                            <img src="${cleanUrl}" alt="Bukti Transfer #${index+1}" class="slider-img">
-                        </div>
-                    `;
-                }
-            });
-
-            // Tampilkan galerinya
-            containerGaleri.style.display = 'block'; 
-            showSlide(currentSlide); // Set slide pertama
-        }
-
-    } catch (e) {
-        console.error("Gagal ambil data:", e);
-    }
-}
-
-// Fungsi Navigasi Slider
-function showSlide(index) {
-    const track = document.getElementById('slider-track');
-    if(index >= totalSlides) currentSlide = 0;
-    else if(index < 0) currentSlide = totalSlides - 1;
-    else currentSlide = index;
-
-    track.style.transform = `translateX(-${currentSlide * 100}%)`;
-}
-
-function geserSlide(arah) {
-    showSlide(currentSlide + arah);
-}
-
-// Auto-play (geser otomatis tiap 4 detik)
-setInterval(() => geserSlide(1), 4000); 
-
-// Jalankan utama
-updateDataDariSheets();
-</script>
+        <div class="card" id="bagian-youtube" style="display: none;">
+            <h2 class="section-title">📺 Livestream YouTube</h2>
+            <div class="youtube-container">
+                <iframe id="youtube-iframe" src="" width="100%" height="400px" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </div>
 
         <div class="card">
             <h2 class="section-title">📜 Aturan Main</h2>
-            <ul>
-                <li>Platform: Lichess.org</li>
-                <li>Format: Arena 60 Menit / Swiss 5 Babak (Sesuai kesepakatan)</li>
-                <li>Kontrol Waktu: 3 Menit + 0 Detik (Blitz)</li>
-                <li>Keputusan panitia (terkait indikasi cheating) adalah mutlak.</li>
+            <ul class="aturan-list" id="list-aturan">
+                <li>Memuat aturan main...</li>
             </ul>
         </div>
     </div>
 
     <footer>
-        &copy; 2026 Pion Merakyat Organizer. Dibuat dengan modal nekat.
+        <div class="social-links" id="wadah-medsos">
+            </div>
+        <p style="color: #777; font-size: 0.9em; margin-top: 15px;">&copy; 2026 Pion Merakyat Organizer. Dibuat dengan modal nekat.</p>
     </footer>
 
+    <script>
+        // 1. LINK CSV GOOGLE SHEETS LO
+        const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
+        
+        let idLichessAktif = ""; // Akan diisi dari Google Sheets
+
+        // --- FUNGSI AMBIL DATA SHEETS (CMS) ---
+        async function updateDataDariSheets() {
+            try {
+                const response = await fetch(urlSheets);
+                const csvText = await response.text();
+                const rows = csvText.split(/\r?\n/);
+                const dataSheet = {};
+
+                rows.forEach(row => {
+                    const indexKoma = row.indexOf(',');
+                    if (indexKoma !== -1) {
+                        const key = row.substring(0, indexKoma).replace(/"/g, "").trim();
+                        const value = row.substring(indexKoma + 1).replace(/"/g, "").trim();
+                        dataSheet[key] = value;
+                    }
+                });
+
+                // UPDATE INFO DASAR
+                if(dataSheet.pengumuman) document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
+                if(dataSheet.slot_sisa) document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
+                if(dataSheet.link_wa) document.getElementById('btn-daftar').href = dataSheet.link_wa;
+
+                // UPDATE ATURAN MAIN (Pisahkan pakai tanda | )
+                if(dataSheet.aturan_main) {
+                    const listAturan = dataSheet.aturan_main.split('|');
+                    let htmlAturan = "";
+                    listAturan.forEach(aturan => {
+                        if(aturan.trim()) htmlAturan += `<li>${aturan.trim()}</li>`;
+                    });
+                    document.getElementById('list-aturan').innerHTML = htmlAturan;
+                }
+
+                // UPDATE MEDSOS
+                let htmlMedsos = "";
+                if(dataSheet.link_ig && dataSheet.link_ig.length > 5) htmlMedsos += `<a href="${dataSheet.link_ig}" target="_blank">📷 Instagram</a>`;
+                if(dataSheet.link_fb && dataSheet.link_fb.length > 5) htmlMedsos += `<a href="${dataSheet.link_fb}" target="_blank">📘 Facebook</a>`;
+                document.getElementById('wadah-medsos').innerHTML = htmlMedsos;
+
+                // UPDATE LICHESS ID
+                if(dataSheet.id_lichess && dataSheet.id_lichess !== idLichessAktif) {
+                    idLichessAktif = dataSheet.id_lichess;
+                    updateKlasemenLichess(); // Panggil klasemen pas ID berubah
+                }
+
+                // UPDATE YOUTUBE
+                if(dataSheet.youtube_live && dataSheet.youtube_live.length > 10) {
+                    const ytUrl = dataSheet.youtube_live;
+                    let ytCode = "";
+                    if(ytUrl.includes("v=")) ytCode = ytUrl.split("v=")[1].substring(0,11);
+                    else if(ytUrl.includes("youtu.be/")) ytCode = ytUrl.split("youtu.be/")[1].substring(0,11);
+                    
+                    if(ytCode) {
+                        document.getElementById('youtube-iframe').src = `https://www.youtube.com/embed/${ytCode}`;
+                        document.getElementById('bagian-youtube').style.display = 'block';
+                    }
+                } else {
+                    document.getElementById('bagian-youtube').style.display = 'none'; // Sembunyi kalau kosong
+                }
+
+                // UPDATE CAROUSEL BUKTI DANA
+                if(dataSheet.daftar_bukti && dataSheet.daftar_bukti.length > 10) {
+                    const track = document.getElementById('carousel-track');
+                    const listBukti = dataSheet.daftar_bukti.split(',');
+                    
+                    // Cek apakah ada perubahan gambar biar gak kedip
+                    if(track.children.length !== listBukti.length) {
+                        track.innerHTML = ""; 
+                        listBukti.forEach((url, i) => {
+                            if(url.trim()) {
+                                track.innerHTML += `<div class="carousel-item"><img src="${url.trim()}" alt="Bukti ${i}" class="carousel-img"></div>`;
+                            }
+                        });
+                        document.getElementById('bagian-galeri').style.display = 'block';
+                        totalBukti = listBukti.length;
+                        startAutoSlide(); // Mulai jalankan carousel
+                    }
+                }
+
+            } catch (e) {
+                console.error("Gagal CMS:", e);
+            }
+        }
+
+        // --- FUNGSI KLASEMEN LICHESS ---
+        async function updateKlasemenLichess() {
+            if(!idLichessAktif) return;
+            const url = `https://lichess.org/api/tournament/${idLichessAktif}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!data.standing || !data.standing.players) return;
+
+                let htmlTabel = `<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95em;">
+                    <tr style="border-bottom: 2px solid #4CAF50; background: #252525;">
+                        <th style="padding: 12px;">Pos</th><th style="padding: 12px;">Pemain</th><th style="padding: 12px;">Rating</th><th style="padding: 12px; text-align: center;">Poin</th>
+                    </tr>`;
+                
+                data.standing.players.forEach((p, i) => {
+                    const rowColor = i === 0 ? "color: #ffcc00; font-weight: bold;" : "";
+                    const bgColor = i % 2 === 0 ? "background: #1a1a1a;" : "background: #222;";
+                    htmlTabel += `<tr style="${bgColor} border-bottom: 1px solid #333;">
+                        <td style="padding: 12px; ${rowColor}">#${i + 1}</td>
+                        <td style="padding: 12px;">${p.name}</td>
+                        <td style="padding: 12px; color: #888;">${p.rating}</td>
+                        <td style="padding: 12px; text-align: center; font-weight: bold; color: #4CAF50;">${p.score}</td>
+                    </tr>`;
+                });
+                document.getElementById("tabel-klasemen").innerHTML = htmlTabel + "</table>";
+                document.getElementById("status-update").innerText = `Terakhir diperbarui: Pukul ${new Date().toLocaleTimeString('id-ID')}`;
+            } catch (error) {
+                console.log("Menunggu Lichess...");
+            }
+        }
+
+        // --- FUNGSI CAROUSEL OTOMATIS ---
+        let currentSlide = 0;
+        let totalBukti = 0;
+        let intervalCarousel;
+
+        function startAutoSlide() {
+            if(intervalCarousel) clearInterval(intervalCarousel);
+            intervalCarousel = setInterval(() => {
+                const track = document.getElementById('carousel-track');
+                const maxSlide = window.innerWidth > 600 ? totalBukti - 3 : totalBukti - 2; 
+                
+                if (maxSlide <= 0) return; // Kalo gambar dikit, ga usah geser
+                currentSlide = currentSlide >= maxSlide ? 0 : currentSlide + 1;
+                
+                const widthPercent = window.innerWidth > 600 ? (100 / 3) : 50;
+                track.style.transform = `translateX(-${currentSlide * widthPercent}%)`;
+            }, 3000); // Geser tiap 3 detik
+        }
+
+        // --- JALANKAN SEMUA SISTEM ---
+        updateDataDariSheets(); // Panggil CMS
+        setInterval(updateDataDariSheets, 60000); // Cek CMS tiap 1 Menit
+        setInterval(updateKlasemenLichess, 20000); // Cek Skor Lichess tiap 20 Detik
+
+    </script>
 </body>
 </html>
