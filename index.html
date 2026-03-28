@@ -33,7 +33,29 @@
     <p id="teks-pengumuman">Sedang memuat pengumuman...</p>
     <p>Sisa Kuota: <strong id="angka-slot" style="color: #ffcc00; font-size: 1.2em;">--</strong> / 50</p>
 </div>
+<div class="card" id="bagian-galeri" style="display: none;"> <h2 class="section-title">💸 Bukti Pendaftaran (Baru Dibayar)</h2>
+    <p style="color: #aaa; font-size: 0.9em; margin-bottom: 15px;">Transparan dan Terpercaya.</p>
+    
+    <div class="slider-container">
+        <div class="slider-track" id="slider-track">
+            </div>
+        <button class="slider-btn prev" onclick="geserSlide(-1)">&#10094;</button>
+        <button class="slider-btn next" onclick="geserSlide(1)">&#10095;</button>
+    </div>
+</div>
 
+<style>
+    /* CSS Buat Slider Gambar */
+    .slider-container { position: relative; width: 100%; max-width: 400px; margin: 0 auto; overflow: hidden; border-radius: 10px; border: 3px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    .slider-track { display: flex; transition: transform 0.5s ease-in-out; }
+    .slider-item { min-width: 100%; box-sizing: border-box; }
+    .slider-img { width: 100%; height: auto; display: block; object-fit: contain; background-color: #000; }
+    
+    .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 50%; font-size: 1.2em; z-index: 10; transition: 0.3s; }
+    .slider-btn:hover { background: #4CAF50; }
+    .slider-btn.prev { left: 10px; }
+    .slider-btn.next { right: 10px; }
+</style>
 <script>
     // GANTI LINK DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS LO TADI
     const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
@@ -79,6 +101,7 @@
     updateDataDariSheets();
     // Refresh otomatis tiap 1 menit
     setInterval(updateDataDariSheets, 60000);
+    
 </script>
 
    <div class="card">
@@ -155,6 +178,80 @@
     
     // Auto-refresh setiap 20 detik biar makin kerasa "Live"
     setInterval(updateKlasemenArena, 20000);
+    let currentSlide = 0;
+let totalSlides = 0;
+
+async function updateDataDariSheets() {
+    try {
+        const response = await fetch(urlSheets);
+        const csvText = await response.text();
+        
+        // Pemrosesan CSV Standar
+        const rows = csvText.split(/\r?\n/);
+        const dataSheet = {};
+        rows.forEach(row => {
+            const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            if (columns && columns.length >= 2) {
+                const key = columns[0].replace(/"/g, "").trim();
+                const value = columns[1].replace(/"/g, "").trim();
+                dataSheet[key] = value;
+            }
+        });
+
+        // 1. Update Pengumuman & Slot (Sistem Lama)
+        if(dataSheet.pengumuman) document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
+        if(dataSheet.slot_sisa) document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
+
+        // 2. Update Galeri Bukti Transfer (Sistem Baru)
+        if(dataSheet.daftar_bukti && dataSheet.daftar_bukti.length > 5) { // Pastikan ada isinya
+            const containerGaleri = document.getElementById('bagian-galeri');
+            const sliderTrack = document.getElementById('slider-track');
+            sliderTrack.innerHTML = ''; // Bersihkan loading
+
+            const listBukti = dataSheet.daftar_bukti.split(',');
+            totalSlides = listBukti.length;
+
+            // Bikin element gambar otomatis
+            listBukti.forEach((urlGambar, index) => {
+                const cleanUrl = urlGambar.trim();
+                if(cleanUrl) {
+                    sliderTrack.innerHTML += `
+                        <div class="slider-item">
+                            <img src="${cleanUrl}" alt="Bukti Transfer #${index+1}" class="slider-img">
+                        </div>
+                    `;
+                }
+            });
+
+            // Tampilkan galerinya
+            containerGaleri.style.display = 'block'; 
+            showSlide(currentSlide); // Set slide pertama
+        }
+
+    } catch (e) {
+        console.error("Gagal ambil data:", e);
+    }
+}
+
+// Fungsi Navigasi Slider
+function showSlide(index) {
+    const track = document.getElementById('slider-track');
+    if(index >= totalSlides) currentSlide = 0;
+    else if(index < 0) currentSlide = totalSlides - 1;
+    else currentSlide = index;
+
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+}
+
+function geserSlide(arah) {
+    showSlide(currentSlide + arah);
+}
+
+// Auto-play (geser otomatis tiap 4 detik)
+setInterval(() => geserSlide(1), 4000); 
+
+// Jalankan utama
+updateDataDariSheets();
 </script>
 
         <div class="card">
