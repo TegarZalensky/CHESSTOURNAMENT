@@ -36,17 +36,76 @@
                - Segala bentuk kecurangan (Engine/Stockfish) akan langsung di-BANNED permanen!</p>
         </div>
 
-        <div class="card">
-    <h2 class="section-title">🏆 Klasemen & Matchup Live</h2>
-    <p style="color: #aaa;">Data akan update otomatis dari Lichess saat turnamen dimulai.</p>
+      <div class="card">
+    <h2 class="section-title">🏆 Klasemen Live</h2>
+    <p style="color: #aaa;">Data ini update otomatis dari arena pertandingan setiap 30 detik.</p>
     
-    <iframe src="https://lichess.org/tournament/qjRAZi6S" 
-            width="100%" 
-            height="500px" 
-            frameborder="0" 
-            style="border-radius: 8px;">
-    </iframe>
+    <div id="tabel-klasemen" style="overflow-x: auto; background: #222; padding: 15px; border-radius: 8px;">
+        <p>Sedang memuat data klasemen...</p>
+    </div>
 </div>
+
+<script>
+    // MASUKIN KODE TURNAMEN LO DI SINI (kode yang ada di link Lichess)
+    // Contoh link: lichess.org/swiss/xYz123ab -> kodenya "xYz123ab"
+    const kodeTurnamen = "qjRAZi6S"; 
+
+    async function ambilKlasemen() {
+        // Ini link khusus Lichess buat ngambil data mentah skor (bukan tampilan webnya)
+        const url = `https://lichess.org/api/swiss/$qjRAZi6S/results?max=50`;
+        
+        try {
+            const respon = await fetch(url);
+            const teksData = await respon.text();
+            
+            if (!teksData) {
+                document.getElementById("tabel-klasemen").innerHTML = "<p>Turnamen belum dimulai atau data kosong.</p>";
+                return;
+            }
+
+            // Lichess ngasih data bentuknya barisan teks (NDJSON), kita rapihin jadi tabel
+            const daftarPemain = teksData.trim().split('\n').map(baris => JSON.parse(baris));
+            
+            // Bikin desain tabelnya
+            let htmlTabel = `
+                <table style="width: 100%; border-collapse: collapse; text-align: left; color: white;">
+                    <tr style="border-bottom: 2px solid #4CAF50; background: #333;">
+                        <th style="padding: 10px;">Rank</th>
+                        <th style="padding: 10px;">Nama Pemain</th>
+                        <th style="padding: 10px;">Poin</th>
+                        <th style="padding: 10px;">Tie Break</th>
+                    </tr>
+            `;
+            
+            // Masukin tiap pemain ke dalam baris tabel
+            daftarPemain.forEach(pemain => {
+                htmlTabel += `
+                    <tr style="border-bottom: 1px solid #444;">
+                        <td style="padding: 10px; font-weight: bold; color: #ffcc00;">#${pemain.rank}</td>
+                        <td style="padding: 10px;">${pemain.username}</td>
+                        <td style="padding: 10px; font-weight: bold;">${pemain.points}</td>
+                        <td style="padding: 10px; color: #aaa;">${pemain.tieBreak}</td>
+                    </tr>
+                `;
+            });
+            
+            htmlTabel += "</table>";
+            
+            // Tunjukin tabelnya di website lo
+            document.getElementById("tabel-klasemen").innerHTML = htmlTabel;
+            
+        } catch (error) {
+            console.log("Gagal narik data:", error);
+            document.getElementById("tabel-klasemen").innerHTML = "<p style='color:red;'>Gagal memuat klasemen. Cek koneksi atau kode turnamen.</p>";
+        }
+    }
+
+    // Jalankan fungsi saat web dibuka
+    ambilKlasemen();
+    
+    // Perintahkan web buat refresh tabel otomatis tiap 30 detik (30000 milidetik)
+    setInterval(ambilKlasemen, 30000);
+</script>
 
         <div class="card">
             <h2 class="section-title">📜 Aturan Main</h2>
