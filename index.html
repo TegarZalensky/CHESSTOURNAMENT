@@ -50,20 +50,20 @@
         <h1>PION MERAKYAT CUP #1</h1>
         <p class="subtitle">Turnamen Catur Online Casual | Rating 300 - 2000</p>
         <p>Entry: Rp 5.000 | Sisa Kuota: <strong id="angka-slot" style="color: #ffcc00; font-size: 1.3em;">--</strong></p>
-        <a href="#" id="btn-daftar" class="btn-daftar">DAFTAR SEKARANG</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScY9TqS8mJ-dwKNAoO4Jr0baudjUMG4ROBFkULwLXYV_FHi1Q/viewform?usp=dialog" class="btn-daftar" target="_blank">DAFTAR SEKARANG</a>
     </header>
 
     <div class="container">
         <div class="pengumuman">
             <h3>📢 INFO TERBARU</h3>
-            <p id="teks-pengumuman">Sedang memuat sistem...</p>
+            <p id="teks-pengumuman">Memuat pengumuman...</p>
         </div>
 
         <div class="card">
             <h2 class="section-title">🏆 Klasemen Live Arena</h2>
             <p id="status-update" style="color: #888; font-size: 0.8em;">Memuat data dari Lichess...</p>
             <div id="tabel-klasemen" style="overflow-x: auto; background: #1a1a1a; padding: 10px; border-radius: 8px;">
-                <p>Menghubungkan...</p>
+                <p>Menghubungkan ke server Lichess...</p>
             </div>
         </div>
 
@@ -85,7 +85,7 @@
         <div class="card">
             <h2 class="section-title">📜 Aturan Main</h2>
             <ul class="aturan-list" id="list-aturan">
-                <li>Memuat aturan main...</li>
+                <li style="color: #888;">Menunggu data aturan dari admin...</li>
             </ul>
         </div>
     </div>
@@ -97,12 +97,11 @@
     </footer>
 
     <script>
-        // 1. LINK CSV GOOGLE SHEETS LO
-        const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?gid=0&single=true&output=csv";
+        // PASTIKAN LINK CSV INI BENAR MILIK LO
+        const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
         
-        let idLichessAktif = ""; // Akan diisi dari Google Sheets
+        let idLichessAktif = ""; 
 
-        // --- FUNGSI AMBIL DATA SHEETS (CMS) ---
         async function updateDataDariSheets() {
             try {
                 const response = await fetch(urlSheets);
@@ -113,42 +112,48 @@
                 rows.forEach(row => {
                     const indexKoma = row.indexOf(',');
                     if (indexKoma !== -1) {
-                        const key = row.substring(0, indexKoma).replace(/"/g, "").trim();
+                        // KODE PINTAR: Paksa huruf kecil semua dan buang spasi biar ga error typo
+                        const key = row.substring(0, indexKoma).replace(/"/g, "").trim().toLowerCase();
                         const value = row.substring(indexKoma + 1).replace(/"/g, "").trim();
                         dataSheet[key] = value;
                     }
                 });
 
                 // UPDATE INFO DASAR
-                if(dataSheet.pengumuman) document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
-                if(dataSheet.slot_sisa) document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
-                if(dataSheet.link_wa) document.getElementById('btn-daftar').href = dataSheet.link_wa;
+                if(dataSheet['pengumuman']) document.getElementById('teks-pengumuman').innerText = dataSheet['pengumuman'];
+                if(dataSheet['slot_sisa']) document.getElementById('angka-slot').innerText = dataSheet['slot_sisa'];
 
-                // UPDATE ATURAN MAIN (Pisahkan pakai tanda | )
-                if(dataSheet.aturan_main) {
-                    const listAturan = dataSheet.aturan_main.split('|');
+                // UPDATE ATURAN MAIN
+                if(dataSheet['aturan_main']) {
+                    const listAturan = dataSheet['aturan_main'].split('|');
                     let htmlAturan = "";
                     listAturan.forEach(aturan => {
                         if(aturan.trim()) htmlAturan += `<li>${aturan.trim()}</li>`;
                     });
                     document.getElementById('list-aturan').innerHTML = htmlAturan;
+                } else {
+                    document.getElementById('list-aturan').innerHTML = "<li style='color: #ff4444;'>Data aturan belum diisi di Sheets.</li>";
                 }
 
                 // UPDATE MEDSOS
                 let htmlMedsos = "";
-                if(dataSheet.link_ig && dataSheet.link_ig.length > 5) htmlMedsos += `<a href="${dataSheet.link_ig}" target="_blank">📷 Instagram</a>`;
-                if(dataSheet.link_fb && dataSheet.link_fb.length > 5) htmlMedsos += `<a href="${dataSheet.link_fb}" target="_blank">📘 Facebook</a>`;
+                if(dataSheet['link_ig'] && dataSheet['link_ig'].length > 5) htmlMedsos += `<a href="${dataSheet['link_ig']}" target="_blank">📷 Instagram</a>`;
+                if(dataSheet['link_fb'] && dataSheet['link_fb'].length > 5) htmlMedsos += `<a href="${dataSheet['link_fb']}" target="_blank">📘 Facebook</a>`;
                 document.getElementById('wadah-medsos').innerHTML = htmlMedsos;
 
                 // UPDATE LICHESS ID
-                if(dataSheet.id_lichess && dataSheet.id_lichess !== idLichessAktif) {
-                    idLichessAktif = dataSheet.id_lichess;
-                    updateKlasemenLichess(); // Panggil klasemen pas ID berubah
+                if(dataSheet['id_lichess']) {
+                    if (dataSheet['id_lichess'] !== idLichessAktif) {
+                        idLichessAktif = dataSheet['id_lichess'];
+                        updateKlasemenLichess(); 
+                    }
+                } else {
+                    document.getElementById("tabel-klasemen").innerHTML = "<p style='color: #ff4444;'>ID Lichess belum dimasukkan di Google Sheets.</p>";
                 }
 
                 // UPDATE YOUTUBE
-                if(dataSheet.youtube_live && dataSheet.youtube_live.length > 10) {
-                    const ytUrl = dataSheet.youtube_live;
+                if(dataSheet['youtube_live'] && dataSheet['youtube_live'].length > 10) {
+                    const ytUrl = dataSheet['youtube_live'];
                     let ytCode = "";
                     if(ytUrl.includes("v=")) ytCode = ytUrl.split("v=")[1].substring(0,11);
                     else if(ytUrl.includes("youtu.be/")) ytCode = ytUrl.split("youtu.be/")[1].substring(0,11);
@@ -158,15 +163,14 @@
                         document.getElementById('bagian-youtube').style.display = 'block';
                     }
                 } else {
-                    document.getElementById('bagian-youtube').style.display = 'none'; // Sembunyi kalau kosong
+                    document.getElementById('bagian-youtube').style.display = 'none'; 
                 }
 
                 // UPDATE CAROUSEL BUKTI DANA
-                if(dataSheet.daftar_bukti && dataSheet.daftar_bukti.length > 10) {
+                if(dataSheet['daftar_bukti'] && dataSheet['daftar_bukti'].length > 10) {
                     const track = document.getElementById('carousel-track');
-                    const listBukti = dataSheet.daftar_bukti.split(',');
+                    const listBukti = dataSheet['daftar_bukti'].split(',');
                     
-                    // Cek apakah ada perubahan gambar biar gak kedip
                     if(track.children.length !== listBukti.length) {
                         track.innerHTML = ""; 
                         listBukti.forEach((url, i) => {
@@ -176,12 +180,13 @@
                         });
                         document.getElementById('bagian-galeri').style.display = 'block';
                         totalBukti = listBukti.length;
-                        startAutoSlide(); // Mulai jalankan carousel
+                        startAutoSlide(); 
                     }
                 }
 
             } catch (e) {
                 console.error("Gagal CMS:", e);
+                document.getElementById('teks-pengumuman').innerText = "Gagal terhubung ke database. Cek link CSV.";
             }
         }
 
@@ -191,8 +196,13 @@
             const url = `https://lichess.org/api/tournament/${idLichessAktif}`;
             try {
                 const response = await fetch(url);
+                if (!response.ok) throw new Error("Turnamen tidak ditemukan");
+                
                 const data = await response.json();
-                if (!data.standing || !data.standing.players) return;
+                if (!data.standing || !data.standing.players) {
+                    document.getElementById("tabel-klasemen").innerHTML = "<p>Turnamen belum dimulai atau belum ada pemain.</p>";
+                    return;
+                }
 
                 let htmlTabel = `<table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95em;">
                     <tr style="border-bottom: 2px solid #4CAF50; background: #252525;">
@@ -212,7 +222,7 @@
                 document.getElementById("tabel-klasemen").innerHTML = htmlTabel + "</table>";
                 document.getElementById("status-update").innerText = `Terakhir diperbarui: Pukul ${new Date().toLocaleTimeString('id-ID')}`;
             } catch (error) {
-                console.log("Menunggu Lichess...");
+                document.getElementById("tabel-klasemen").innerHTML = "<p style='color: #ff4444;'>Gagal menghubungkan. Pastikan ID Lichess benar.</p>";
             }
         }
 
@@ -227,18 +237,18 @@
                 const track = document.getElementById('carousel-track');
                 const maxSlide = window.innerWidth > 600 ? totalBukti - 3 : totalBukti - 2; 
                 
-                if (maxSlide <= 0) return; // Kalo gambar dikit, ga usah geser
+                if (maxSlide <= 0) return; 
                 currentSlide = currentSlide >= maxSlide ? 0 : currentSlide + 1;
                 
                 const widthPercent = window.innerWidth > 600 ? (100 / 3) : 50;
                 track.style.transform = `translateX(-${currentSlide * widthPercent}%)`;
-            }, 3000); // Geser tiap 3 detik
+            }, 3000); 
         }
 
         // --- JALANKAN SEMUA SISTEM ---
-        updateDataDariSheets(); // Panggil CMS
-        setInterval(updateDataDariSheets, 60000); // Cek CMS tiap 1 Menit
-        setInterval(updateKlasemenLichess, 20000); // Cek Skor Lichess tiap 20 Detik
+        updateDataDariSheets(); 
+        setInterval(updateDataDariSheets, 60000); 
+        setInterval(updateKlasemenLichess, 20000); 
 
     </script>
 </body>
