@@ -36,75 +36,80 @@
                - Segala bentuk kecurangan (Engine/Stockfish) akan langsung di-BANNED permanen!</p>
         </div>
 
-      <div class="card">
-    <h2 class="section-title">🏆 Klasemen Live</h2>
-    <p style="color: #aaa;">Data ini update otomatis dari arena pertandingan setiap 30 detik.</p>
+   <div class="card">
+    <h2 class="section-title">🏆 Klasemen Live Arena</h2>
+    <p id="status-update" style="color: #888; font-size: 0.8em;">Memuat data terbaru...</p>
     
-    <div id="tabel-klasemen" style="overflow-x: auto; background: #222; padding: 15px; border-radius: 8px;">
-        <p>Sedang memuat data klasemen...</p>
+    <div id="tabel-klasemen" style="overflow-x: auto; background: #1e1e1e; padding: 10px; border-radius: 8px; border: 1px solid #333;">
+        <p>Menghubungkan ke Lichess Arena...</p>
     </div>
 </div>
 
 <script>
-    // MASUKIN KODE TURNAMEN LO DI SINI (kode yang ada di link Lichess)
-    // Contoh link: lichess.org/swiss/xYz123ab -> kodenya "xYz123ab"
-    const kodeTurnamen = "qjRAZi6S"; 
+    // ID Turnamen dari link yang lo kasih
+    const arenaId = "qjRAZi6S"; 
 
-    async function ambilKlasemen() {
-        // Ini link khusus Lichess buat ngambil data mentah skor (bukan tampilan webnya)
-        const url = `https://lichess.org/api/swiss/qjRAZi6S/results?max=50`;
+    async function updateKlasemenArena() {
+        const url = `https://lichess.org/api/tournament/${arenaId}`;
         
         try {
-            const respon = await fetch(url);
-            const teksData = await respon.text();
+            const response = await fetch(url);
+            const data = await response.json();
             
-            if (!teksData) {
-                document.getElementById("tabel-klasemen").innerHTML = "<p>Turnamen belum dimulai atau data kosong.</p>";
+            if (!data.standing || !data.standing.players) {
+                document.getElementById("tabel-klasemen").innerHTML = "<p>Belum ada pemain yang bergabung.</p>";
                 return;
             }
 
-            // Lichess ngasih data bentuknya barisan teks (NDJSON), kita rapihin jadi tabel
-            const daftarPemain = teksData.trim().split('\n').map(baris => JSON.parse(baris));
-            
-            // Bikin desain tabelnya
             let htmlTabel = `
-                <table style="width: 100%; border-collapse: collapse; text-align: left; color: white;">
-                    <tr style="border-bottom: 2px solid #4CAF50; background: #333;">
-                        <th style="padding: 10px;">Rank</th>
-                        <th style="padding: 10px;">Nama Pemain</th>
-                        <th style="padding: 10px;">Poin</th>
-                        <th style="padding: 10px;">Tie Break</th>
+                <table style="width: 100%; border-collapse: collapse; text-align: left; color: #eee; font-size: 0.95em;">
+                    <tr style="border-bottom: 2px solid #4CAF50; background: #252525;">
+                        <th style="padding: 12px;">Pos</th>
+                        <th style="padding: 12px;">Nama Pemain</th>
+                        <th style="padding: 12px;">Rating</th>
+                        <th style="padding: 12px; text-align: center;">Poin</th>
                     </tr>
             `;
             
-            // Masukin tiap pemain ke dalam baris tabel
-            daftarPemain.forEach(pemain => {
+            data.standing.players.forEach((player, index) => {
+                // Kasih warna emas buat peringkat 1
+                const rowColor = index === 0 ? "color: #ffcc00; font-weight: bold;" : "";
+                const bgColor = index % 2 === 0 ? "background: #1a1a1a;" : "background: #222;";
+                
                 htmlTabel += `
-                    <tr style="border-bottom: 1px solid #444;">
-                        <td style="padding: 10px; font-weight: bold; color: #ffcc00;">#${pemain.rank}</td>
-                        <td style="padding: 10px;">${pemain.username}</td>
-                        <td style="padding: 10px; font-weight: bold;">${pemain.points}</td>
-                        <td style="padding: 10px; color: #aaa;">${pemain.tieBreak}</td>
+                    <tr style="${bgColor} border-bottom: 1px solid #333;">
+                        <td style="padding: 12px; ${rowColor}">#${index + 1}</td>
+                        <td style="padding: 12px;">
+                            ${player.name} 
+                            ${player.withdraw ? '<span style="color: #ff4444; font-size: 0.7em;">(Keluar)</span>' : ''}
+                        </td>
+                        <td style="padding: 12px; color: #888;">${player.rating}</td>
+                        <td style="padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; color: #4CAF50;">
+                            ${player.score}
+                        </td>
                     </tr>
                 `;
             });
             
             htmlTabel += "</table>";
             
-            // Tunjukin tabelnya di website lo
             document.getElementById("tabel-klasemen").innerHTML = htmlTabel;
             
+            // Update waktu terakhir dicek
+            const skrg = new Date().toLocaleTimeString('id-ID');
+            document.getElementById("status-update").innerText = `Terakhir diperbarui: Pukul ${skrg}`;
+
         } catch (error) {
-            console.log("Gagal narik data:", error);
-            document.getElementById("tabel-klasemen").innerHTML = "<p style='color:red;'>Gagal memuat klasemen. Cek koneksi atau kode turnamen.</p>";
+            console.error("Error:", error);
+            document.getElementById("tabel-klasemen").innerHTML = "<p style='color: #ff4444;'>Gagal mengambil data. Pastikan ID Turnamen benar.</p>";
         }
     }
 
-    // Jalankan fungsi saat web dibuka
-    ambilKlasemen();
+    // Jalankan pertama kali
+    updateKlasemenArena();
     
-    // Perintahkan web buat refresh tabel otomatis tiap 30 detik (30000 milidetik)
-    setInterval(ambilKlasemen, 30000);
+    // Auto-refresh setiap 20 detik biar makin kerasa "Live"
+    setInterval(updateKlasemenArena, 20000);
 </script>
 
         <div class="card">
