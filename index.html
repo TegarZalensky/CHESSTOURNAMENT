@@ -39,31 +39,41 @@
     const urlSheets = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS2D5GgM-lIZvHuP5uIBLNSFZmxle2M_0ZmBTLYyDnBv3PmuGoL8f1QaRFcGuqaZwsZu14k-UbKDxpy/pub?output=csv";
 
     async function updateDataDariSheets() {
-        try {
-            const response = await fetch(urlSheets);
-            const data = await response.text();
-            
-            // Proses data CSV sederhana
-            const baris = data.split('\n');
-            const dataSheet = {};
-            
-            baris.forEach(b => {
-                const item = b.split(',');
-                dataSheet[item[0]] = item[1];
-            });
+    try {
+        const response = await fetch(urlSheets);
+        const csvText = await response.text();
+        
+        // Regex ini fungsinya biar koma di dalem tanda kutip nggak ikut kepisah
+        const rows = csvText.split(/\r?\n/);
+        const dataSheet = {};
 
-            // Update ke tampilan Website
-            if(dataSheet.pengumuman) {
-                document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
+        rows.forEach(row => {
+            // Memisahkan kolom tapi mengabaikan koma di dalam teks (CSV Standard)
+            const columns = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            if (columns && columns.length >= 2) {
+                const key = columns[0].replace(/"/g, "").trim();
+                const value = columns[1].replace(/"/g, "").trim();
+                dataSheet[key] = value;
             }
-            if(dataSheet.slot_sisa) {
-                document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
-            }
-            
-        } catch (e) {
-            console.error("Gagal ambil data admin:", e);
+        });
+
+        // Update ke Website
+        if(dataSheet.pengumuman) {
+            document.getElementById('teks-pengumuman').innerText = dataSheet.pengumuman;
         }
+        if(dataSheet.slot_sisa) {
+            document.getElementById('angka-slot').innerText = dataSheet.slot_sisa;
+        }
+        // Link WA kalau mau dibuat dinamis juga
+        if(dataSheet.link_wa) {
+            const btnDaftar = document.querySelector('.btn-daftar');
+            if(btnDaftar) btnDaftar.href = dataSheet.link_wa;
+        }
+        
+    } catch (e) {
+        console.error("Gagal ambil data:", e);
     }
+}
 
     // Jalankan fungsinya
     updateDataDariSheets();
